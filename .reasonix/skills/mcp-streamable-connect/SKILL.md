@@ -65,47 +65,162 @@ node .reasonix/skills/mcp-streamable-connect/mcp-bridge.js close
 | `ping` | 心跳保活 | `node mcp-bridge.js ping` |
 | `close` | 发送 close 通知并清理 session | `node mcp-bridge.js close` |
 
-## 常用 MCP 方法
+## Chrome MCP 工具参考
 
-### 工具相关
+本技能对接的是 [mcp-chrome-2026](https://github.com/phoenixlucky/mcp-chrome-2026) 服务，以下是所有可用工具及调用示例。
+
+### 📊 浏览器管理
+
 ```bash
-# 列出所有工具
-node mcp-bridge.js call tools/list
+# 列出所有窗口和标签页
+node mcp-bridge.js call tools/call '{"name":"get_windows_and_tabs","arguments":{}}'
 
-# 调用工具
-node mcp-bridge.js call tools/call '{"name":"get_weather","arguments":{"city":"北京"}}'
+# 导航到 URL
+node mcp-bridge.js call tools/call '{"name":"chrome_navigate","arguments":{"url":"https://example.com"}}'
+
+# 新窗口打开
+node mcp-bridge.js call tools/call '{"name":"chrome_navigate","arguments":{"url":"https://example.com","newWindow":true,"width":1920,"height":1080}}'
+
+# 关闭标签页
+node mcp-bridge.js call tools/call '{"name":"chrome_close_tabs","arguments":{"tabIds":[123,456]}}'
+
+# 切换标签页
+node mcp-bridge.js call tools/call '{"name":"chrome_switch_tab","arguments":{"tabId":456}}'
+
+# 浏览器历史导航
+node mcp-bridge.js call tools/call '{"name":"chrome_go_back_or_forward","arguments":{"direction":"back"}}'
 ```
 
-### 资源相关
+### 📸 截图和视觉
+
 ```bash
-# 列出资源
-node mcp-bridge.js call resources/list
+# 截取全页截图（返回 base64）
+node mcp-bridge.js call tools/call '{"name":"chrome_screenshot","arguments":{"fullPage":true,"storeBase64":true}}'
 
-# 读取资源
-node mcp-bridge.js call resources/read '{"uri":"resource://example"}'
-
-# 订阅资源变更
-node mcp-bridge.js call resources/subscribe '{"uri":"resource://example"}'
+# 截取特定元素截图
+node mcp-bridge.js call tools/call '{"name":"chrome_screenshot","arguments":{"selector":".main-content","storeBase64":true}}'
 ```
 
-### Prompt 相关
-```bash
-# 列出 Prompt 模板
-node mcp-bridge.js call prompts/list
+### 🌐 网络监控
 
-# 获取 Prompt
-node mcp-bridge.js call prompts/get '{"name":"example","arguments":{}}'
+```bash
+# 开始捕获网络请求
+node mcp-bridge.js call tools/call '{"name":"chrome_network_capture_start","arguments":{"maxCaptureTime":30000}}'
+
+# 停止捕获并获取结果
+node mcp-bridge.js call tools/call '{"name":"chrome_network_capture_stop","arguments":{}}'
+
+# 发送自定义 HTTP 请求
+node mcp-bridge.js call tools/call '{"name":"chrome_network_request","arguments":{"url":"https://api.example.com/data","method":"GET"}}'
+
+# 阻止图片加载
+node mcp-bridge.js call tools/call '{"name":"chrome_block_images","arguments":{"action":"start"}}'
 ```
 
-### 连接生命周期
+### 🔍 内容分析
+
+```bash
+# 跨标签页语义搜索
+node mcp-bridge.js call tools/call '{"name":"search_tabs_content","arguments":{"query":"搜索关键词"}}'
+
+# 提取网页文本内容
+node mcp-bridge.js call tools/call '{"name":"chrome_get_web_content","arguments":{"format":"text"}}'
+
+# 查找页面可交互元素
+node mcp-bridge.js call tools/call '{"name":"chrome_get_interactive_elements","arguments":{}}'
+```
+
+### 🎯 交互操作
+
+```bash
+# 点击元素
+node mcp-bridge.js call tools/call '{"name":"chrome_click_element","arguments":{"selector":"#submit-button"}}'
+
+# 填充表单字段
+node mcp-bridge.js call tools/call '{"name":"chrome_fill_or_select","arguments":{"selector":"#email-input","value":"user@example.com"}}'
+
+# 模拟键盘输入
+node mcp-bridge.js call tools/call '{"name":"chrome_keyboard","arguments":{"keys":"Ctrl+A","selector":"#text-input"}}'
+```
+
+### 📚 数据管理
+
+```bash
+# 搜索浏览器历史
+node mcp-bridge.js call tools/call '{"name":"chrome_history","arguments":{"text":"github","maxResults":50}}'
+
+# 搜索书签
+node mcp-bridge.js call tools/call '{"name":"chrome_bookmark_search","arguments":{"query":"文档","maxResults":20}}'
+
+# 添加书签
+node mcp-bridge.js call tools/call '{"name":"chrome_bookmark_add","arguments":{"url":"https://example.com","title":"示例网站","parentId":"工作/资源","createFolder":true}}'
+
+# 删除书签
+node mcp-bridge.js call tools/call '{"name":"chrome_bookmark_delete","arguments":{"url":"https://example.com"}}'
+```
+
+### 🕸️ 抓取与提取
+
+```bash
+# 获取标签页 URL 和标题
+node mcp-bridge.js call tools/call '{"name":"chrome_get_tab_url","arguments":{"tabId":123}}'
+
+# 滚动页面
+node mcp-bridge.js call tools/call '{"name":"chrome_scroll","arguments":{"amount":500}}'
+
+# 滚动到页面底部（懒加载模式）
+node mcp-bridge.js call tools/call '{"name":"chrome_scroll","arguments":{"toBottom":true,"lazyLoad":true}}'
+
+# 获取滚动状态
+node mcp-bridge.js call tools/call '{"name":"chrome_get_scroll_state","arguments":{}}'
+
+# 等待元素出现
+node mcp-bridge.js call tools/call '{"name":"chrome_wait","arguments":{"selector":".product-list","waitFor":"visible","timeout":15000}}'
+
+# 提取结构化数据
+node mcp-bridge.js call tools/call '{"name":"chrome_extract","arguments":{"selector":".product-card","fields":[{"name":"title","selector":".product-title","type":"text"},{"name":"price","selector":".price","type":"number"}],"limit":20}}'
+
+# 提取文章正文（Readability）
+node mcp-bridge.js call tools/call '{"name":"chrome_get_page_text","arguments":{}}'
+
+# 点击并等待
+node mcp-bridge.js call tools/call '{"name":"chrome_click_and_wait","arguments":{"selector":"#load-more-button","waitSelector":".new-content","waitFor":"visible"}}'
+```
+
+## 完整工作流示例
+
+以下是一个典型的浏览器自动化完整流程：
+
+```bash
+# 1️⃣ 初始化连接
+node mcp-bridge.js init
+
+# 2️⃣ 导航到目标页面
+node mcp-bridge.js call tools/call '{"name":"chrome_navigate","arguments":{"url":"https://example.com"}}'
+
+# 3️⃣ 等待页面加载
+node mcp-bridge.js call tools/call '{"name":"chrome_wait","arguments":{"selector":".main-content","waitFor":"visible"}}'
+
+# 4️⃣ 提取页面数据
+node mcp-bridge.js call tools/call '{"name":"chrome_extract","arguments":{"selector":".data-item","fields":[{"name":"title","type":"text"}]}}'
+
+# 5️⃣ 截图保存
+node mcp-bridge.js call tools/call '{"name":"chrome_screenshot","arguments":{"fullPage":true,"storeBase64":true}}'
+
+# 6️⃣ 关闭连接
+node mcp-bridge.js close
+```
+
+## 连接生命周期
+
 ```bash
 # 初始化
 node mcp-bridge.js init
 
-# 心跳
+# 心跳保活
 node mcp-bridge.js ping
 
-# 关闭
+# 关闭连接
 node mcp-bridge.js close
 ```
 
