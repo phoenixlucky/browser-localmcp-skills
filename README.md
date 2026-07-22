@@ -128,7 +128,50 @@
 | **Reasonix** | AI Agent 框架，支持 MCP 技能发现 |
 | **MCP 服务** | 运行在 `http://127.0.0.1:12306/mcp` 的 streamable-http 服务 |
 
-### 安装
+### 安装 Chrome MCP 服务
+
+本技能包需要一个运行中的 [mcp-chrome-2026](https://github.com/phoenixlucky/mcp-chrome-2026) 服务作为后端。按照以下三步即可完成安装：
+
+#### 1️⃣ 安装 Chrome 扩展
+
+从 [Releases 页面](https://github.com/phoenixlucky/mcp-chrome-2026/releases) 下载 `chrome-mcp-server-*.zip`，然后：
+
+1. 打开 Chrome 地址栏输入 `chrome://extensions/`
+2. 开启右上角的 **开发者模式**
+3. 将下载的 `.zip` 文件直接拖入页面完成安装
+
+#### 2️⃣ 安装 Native Host（桥接器）
+
+```bash
+# npm（推荐，postinstall 自动注册 Native Messaging Host）
+npm install -g @ethanwilkins/mcp-chrome-bridge-2026
+
+# 或使用 pnpm
+pnpm install -g @ethanwilkins/mcp-chrome-bridge-2026
+```
+
+> 如需手动注册：`mcp-chrome-bridge register`
+
+#### 3️⃣ 启动服务
+
+```bash
+# 一键启动（推荐）
+mcp-chrome-bridge start
+
+# 或克隆仓库后使用脚本
+start-server.bat
+```
+
+服务将在 `http://127.0.0.1:12306/mcp` 监听。确认服务在线：
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:12306/mcp
+# 预期输出: 200
+```
+
+---
+
+### 安装本技能包
 
 ```bash
 # 克隆仓库
